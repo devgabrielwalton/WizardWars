@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WizardWarsLibrary.Enums;
 using WizardWarsLibrary.Logic;
 using WizardWarsLibrary.Models;
 
@@ -14,10 +15,54 @@ namespace WizardWars
         {
             WelcomeMessage();
 
-            var player01 = CreatePlayer("Wizard 1");
-            var player02 = CreatePlayer("Wizard 2");
+            var activePlayer = CreatePlayer("Wizard 1");
+            var opponent = CreatePlayer("Wizard 2");
+
+            PlayerInfoModel winner = null;
+
+            while(winner == null)
+            {
+                DisplayArena(activePlayer);
+                RecordShot(activePlayer, opponent);
+            }
 
             Console.ReadLine();
+        }
+
+        private static void RecordShot(PlayerInfoModel activePlayer, PlayerInfoModel opponent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void DisplayArena(PlayerInfoModel activePlayer)
+        {
+            var currentRow = activePlayer.ShotGrid[0].Letter;
+
+            foreach (var gridLocation in activePlayer.ShotGrid)
+            {
+                if(gridLocation.Letter != currentRow)
+                {
+                    Console.WriteLine();
+                    currentRow = gridLocation.Letter;
+                }
+
+                if (gridLocation.Status == WizardWarsEnums.LocationStatus.Empty)
+                {
+                    Console.Write($" { gridLocation.Letter }{ gridLocation.Number } ");
+                }
+                else if (gridLocation.Status == WizardWarsEnums.LocationStatus.Hit)
+                {
+                    Console.Write(" X ");
+                }
+                else if (gridLocation.Status == WizardWarsEnums.LocationStatus.Miss)
+                {
+                    Console.Write(" O ");
+                }
+                else
+                {
+                    Console.Write(" ? ");
+                }
+            }
         }
 
         private static void WelcomeMessage()
@@ -36,7 +81,7 @@ namespace WizardWars
                 PlayerName = AskForPlayersName()
             };
 
-            GameLogic.InitialiseGrid(output);
+            GameLogic.InitialiseArena(output);
 
             PlaceWizards(output);
 

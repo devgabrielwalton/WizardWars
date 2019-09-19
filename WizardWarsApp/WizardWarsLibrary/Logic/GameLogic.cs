@@ -11,7 +11,7 @@ namespace WizardWarsLibrary.Logic
 {
     public static class GameLogic
     {
-        public static void InitialiseGrid(PlayerInfoModel playerInfoModel)
+        public static void InitialiseArena(PlayerInfoModel playerInfoModel)
         {
             var letters = new List<string> { "A", "B", "C", "D", "E", };
             var numbers = new List<int> { 1, 2, 3, 4, 5, };
