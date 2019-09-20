@@ -1,46 +1,86 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WizardWarsLibrary.Enums;
 using WizardWarsLibrary.Logic;
 using WizardWarsLibrary.Models;
 
 namespace WizardWars
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             WelcomeMessage();
 
-            var activePlayer = CreatePlayer("Wizard 1");
-            var opponent = CreatePlayer("Wizard 2");
-
+            PlayerInfoModel activePlayer = CreatePlayer("Wizard 1");
+            PlayerInfoModel opponent = CreatePlayer("Wizard 2");
             PlayerInfoModel winner = null;
 
-            while(winner == null)
+            while (winner == null)
             {
-                DisplayArena(activePlayer);
-                RecordShot(activePlayer, opponent);
+                DisplaySpellGrid(activePlayer);
+                RecordPlayerSpell(activePlayer, opponent);
+
+                bool doesGameContinue = GameLogic.PlayerStillActive(opponent);
+
+                if (doesGameContinue)
+                {
+                    (activePlayer, opponent) = (opponent, activePlayer);
+                }
+                else
+                {
+                    winner = activePlayer;
+                }
             }
+
+            IdentifyWinner(winner);
 
             Console.ReadLine();
         }
 
-        private static void RecordShot(PlayerInfoModel activePlayer, PlayerInfoModel opponent)
+        private static void IdentifyWinner(PlayerInfoModel winner)
         {
-            throw new NotImplementedException();
+            Console.WriteLine($"{ winner.PlayerName } won the Wizard War!");
+            Console.WriteLine($"{ winner.PlayerName } took { GameLogic.GetSpellCount(winner) } spells.");
         }
 
-        private static void DisplayArena(PlayerInfoModel activePlayer)
+        private static void RecordPlayerSpell(PlayerInfoModel activePlayer, PlayerInfoModel opponent)
         {
-            var currentRow = activePlayer.ShotGrid[0].Letter;
+            bool isValidSpell = false;
+            string row = string.Empty;
+            int column = 0;
 
-            foreach (var gridLocation in activePlayer.ShotGrid)
+            while(!isValidSpell)
             {
-                if(gridLocation.Letter != currentRow)
+                string spell = AskForSpell();
+                (row, column) = GameLogic.SplitSpellIntoRowAndColumn(spell);
+                isValidSpell = GameLogic.ValidateSpell(activePlayer, row, column);
+
+                if(!isValidSpell)
+                {
+                    Console.WriteLine("Invalid spell location. Please try again.");
+                }
+            }
+
+            bool isSuccefulSpell = GameLogic.IdentifySpellResult(opponent, row, column);
+
+            GameLogic.MarkSpellResult(activePlayer, row, column, isSuccefulSpell);
+        }
+
+        private static string AskForSpell()
+        {
+            Console.Write("Please enter your spell selection: ");
+            string output = Console.ReadLine();
+
+            return output;
+        }
+
+        private static void DisplaySpellGrid(PlayerInfoModel activePlayer)
+        {
+            string currentRow = activePlayer.SpellGrid[0].Letter;
+
+            foreach (var gridLocation in activePlayer.SpellGrid)
+            {
+                if (gridLocation.Letter != currentRow)
                 {
                     Console.WriteLine();
                     currentRow = gridLocation.Letter;
@@ -86,7 +126,7 @@ namespace WizardWars
             PlaceWizards(output);
 
             Console.Clear();
-            
+
             return output;
         }
 

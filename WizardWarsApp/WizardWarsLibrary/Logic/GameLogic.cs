@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WizardWarsLibrary.Enums;
 using WizardWarsLibrary.Models;
-
 
 namespace WizardWarsLibrary.Logic
 {
@@ -18,7 +14,7 @@ namespace WizardWarsLibrary.Logic
 
             foreach (var letter in letters)
             {
-                foreach(var number in numbers)
+                foreach (var number in numbers)
                 {
                     AddGridSpot(playerInfoModel, letter, number);
                 }
@@ -34,10 +30,40 @@ namespace WizardWarsLibrary.Logic
                 Status = WizardWarsEnums.LocationStatus.Empty
             };
 
-            playerInfoModel.ShotGrid.Add(location);
+            playerInfoModel.SpellGrid.Add(location);
         }
 
         public static bool PlaceWizard(PlayerInfoModel playerInfoModel, string location)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static bool PlayerStillActive(PlayerInfoModel opponent)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static int GetSpellCount(PlayerInfoModel winner)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static (string row, int column) SplitSpellIntoRowAndColumn(string spell)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static bool ValidateSpell(PlayerInfoModel activePlayer, string row, int column)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static bool IdentifySpellResult(PlayerInfoModel opponent, string row, int column)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void MarkSpellResult(PlayerInfoModel activePlayer, string row, int column, bool isSuccefulSpell)
         {
             throw new NotImplementedException();
         }
