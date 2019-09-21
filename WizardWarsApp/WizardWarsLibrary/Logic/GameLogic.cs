@@ -160,6 +160,7 @@ namespace WizardWarsLibrary.Logic
                 if (wizard.Letter == row.ToUpper() && wizard.Number == column)
                 {
                     isAHit = true;
+                    wizard.Status = WizardWarsEnums.LocationStatus.Killed;
                 }
             }
 

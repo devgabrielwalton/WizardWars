@@ -49,26 +49,51 @@ namespace WizardWars
             string row = string.Empty;
             int column = 0;
 
-            while(!isValidSpell)
+            while (!isValidSpell)
             {
-                string spell = AskForSpell();
-                (row, column) = GameLogic.SplitSpellIntoRowAndColumn(spell);
-                isValidSpell = GameLogic.ValidateSpell(activePlayer, row, column);
+                string spell = AskForSpell(activePlayer);
+                try
+                {
+                    (row, column) = GameLogic.SplitSpellIntoRowAndColumn(spell);
+                    isValidSpell = GameLogic.ValidateSpell(activePlayer, row, column);
+                }
+                catch (Exception)
+                {
+                    isValidSpell = false;
+                }
 
-                if(!isValidSpell)
+                if (!isValidSpell)
                 {
                     Console.WriteLine("Invalid spell location. Please try again.");
                 }
             }
 
-            bool isSuccefulSpell = GameLogic.IdentifySpellResult(opponent, row, column);
+            bool isAHit = GameLogic.IdentifySpellResult(opponent, row, column);
 
-            GameLogic.MarkSpellResult(activePlayer, row, column, isSuccefulSpell);
+            GameLogic.MarkSpellResult(activePlayer, row, column, isAHit);
+
+            DisplaySpellResult(row, column, isAHit);
         }
 
-        private static string AskForSpell()
+        private static void DisplaySpellResult(string row, int column, bool isAHit)
         {
-            Console.Write("Please enter your spell selection: ");
+            if (isAHit)
+            {
+                Console.WriteLine();
+                Console.WriteLine($"[+]{ row }{ column } is a Hit!");
+            }
+            else
+            {
+                Console.WriteLine();
+                Console.WriteLine($"[-]{ row }{ column } is a Miss.");
+            }
+
+            Console.WriteLine();
+        }
+
+        private static string AskForSpell(PlayerInfoModel player)
+        {
+            Console.Write($"{ player.PlayerName }, please enter your spell selection: ");
             string output = Console.ReadLine();
 
             return output;
@@ -92,17 +117,20 @@ namespace WizardWars
                 }
                 else if (gridLocation.Status == WizardWarsEnums.LocationStatus.Hit)
                 {
-                    Console.Write(" X ");
+                    Console.Write(" X  ");
                 }
                 else if (gridLocation.Status == WizardWarsEnums.LocationStatus.Miss)
                 {
-                    Console.Write(" O ");
+                    Console.Write(" O  ");
                 }
                 else
                 {
-                    Console.Write(" ? ");
+                    Console.Write(" ?  ");
                 }
             }
+
+            Console.WriteLine();
+            Console.WriteLine();
         }
 
         private static void WelcomeMessage()
@@ -145,7 +173,16 @@ namespace WizardWars
                 Console.Write($"Where would you like to place wizard number { playerInfoModel.WizardLocations.Count + 1 }: ");
                 var location = Console.ReadLine();
 
-                var isValidLocation = GameLogic.PlaceWizard(playerInfoModel, location);
+                var isValidLocation = false;
+
+                try
+                {
+                    isValidLocation = GameLogic.PlaceWizard(playerInfoModel, location);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: { ex.Message }");
+                }
 
                 if (!isValidLocation)
                 {
