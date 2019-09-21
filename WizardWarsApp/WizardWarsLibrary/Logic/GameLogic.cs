@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using WizardWarsLibrary.Enums;
 using WizardWarsLibrary.Models;
 
@@ -33,39 +34,154 @@ namespace WizardWarsLibrary.Logic
             playerInfoModel.SpellGrid.Add(location);
         }
 
+        public static bool PlayerStillActive(PlayerInfoModel player)
+        {
+            bool isActive = false;
+
+            foreach (var wizard in player.WizardLocations)
+            {
+                if (wizard.Status != WizardWarsEnums.LocationStatus.Killed)
+                {
+                    isActive = true;
+                }
+            }
+
+            return isActive;
+        }
+
+        public static int GetSpellCount(PlayerInfoModel player)
+        {
+            var count = 0;
+
+            foreach (var shot in player.SpellGrid)
+            {
+                if (shot.Status != WizardWarsEnums.LocationStatus.Empty)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
         public static bool PlaceWizard(PlayerInfoModel playerInfoModel, string location)
         {
-            throw new NotImplementedException();
+            var output = false;
+
+            (string row, int column) = SplitSpellIntoRowAndColumn(location);
+
+            var isValidLocation = ValidateGridLocation(playerInfoModel, row, column);
+            var isSpotOpen = ValidateWizardLocation(playerInfoModel, row, column);
+
+            if (isValidLocation && isSpotOpen)
+            {
+                playerInfoModel.WizardLocations.Add(new GridLocationModel
+                {
+                    Letter = row.ToUpper(),
+                    Number = column,
+                    Status = WizardWarsEnums.LocationStatus.Wizard
+                });
+
+                output = true;
+            }
+
+            return output;
         }
 
-        public static bool PlayerStillActive(PlayerInfoModel opponent)
+        private static bool ValidateWizardLocation(PlayerInfoModel playerInfoModel, string row, int column)
         {
-            throw new NotImplementedException();
+            var isValidLocation = true;
+
+            foreach (var wizard in playerInfoModel.WizardLocations)
+            {
+                if (wizard.Letter == row.ToUpper() && wizard.Number == column)
+                {
+                    isValidLocation = false;
+                }
+            }
+
+            return isValidLocation;
         }
 
-        public static int GetSpellCount(PlayerInfoModel winner)
+        private static bool ValidateGridLocation(PlayerInfoModel playerInfoModel, string row, int column)
         {
-            throw new NotImplementedException();
+            var isValidLocation = false;
+
+            foreach (var spot in playerInfoModel.SpellGrid)
+            {
+                if (spot.Letter == row.ToUpper() && spot.Number == column)
+                {
+                    isValidLocation = true;
+                }
+            }
+
+            return isValidLocation;
         }
 
         public static (string row, int column) SplitSpellIntoRowAndColumn(string spell)
         {
-            throw new NotImplementedException();
+            if (spell.Length != 2)
+            {
+                throw new ArgumentException("This was an invalid spell type.", "spell");
+            }
+
+            var spellArray = spell.ToArray();
+
+            string row = spellArray[0].ToString();
+            int column = int.Parse(spellArray[1].ToString());
+
+            return (row, column);
         }
 
-        public static bool ValidateSpell(PlayerInfoModel activePlayer, string row, int column)
+        public static bool ValidateSpell(PlayerInfoModel player, string row, int column)
         {
-            throw new NotImplementedException();
+            var isValidSpell = false;
+
+            foreach (var spot in player.SpellGrid)
+            {
+                if (spot.Letter == row.ToUpper() && spot.Number == column)
+                {
+                    if (spot.Status == WizardWarsEnums.LocationStatus.Empty)
+                    {
+                        isValidSpell = true;
+                    }
+                }
+            }
+
+            return isValidSpell;
         }
 
         public static bool IdentifySpellResult(PlayerInfoModel opponent, string row, int column)
         {
-            throw new NotImplementedException();
+            var isAHit = false;
+
+            foreach (var wizard in opponent.WizardLocations)
+            {
+                if (wizard.Letter == row.ToUpper() && wizard.Number == column)
+                {
+                    isAHit = true;
+                }
+            }
+
+            return isAHit;
         }
 
-        public static void MarkSpellResult(PlayerInfoModel activePlayer, string row, int column, bool isSuccefulSpell)
+        public static void MarkSpellResult(PlayerInfoModel player, string row, int column, bool isAHit)
         {
-            throw new NotImplementedException();
+            foreach (var spot in player.SpellGrid)
+            {
+                if (spot.Letter == row.ToUpper() && spot.Number == column)
+                {
+                    if (isAHit)
+                    {
+                        spot.Status = WizardWarsEnums.LocationStatus.Hit;
+                    }
+                    else
+                    {
+                        spot.Status = WizardWarsEnums.LocationStatus.Miss;
+                    }
+                }
+            }
         }
     }
 }
